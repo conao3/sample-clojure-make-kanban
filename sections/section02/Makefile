@@ -15,6 +15,10 @@ repl:
 update:
 	clojure -Sdeps '{:deps {com.github.liquidz/antq {:mvn/version "RELEASE"}}}' -M -m antq.core --upgrade --force
 
+.PHONY: test
+test:
+	clojure -M:dev:test
+
 .PHONY: uber
 uber: target/kanban-standalone.jar
 

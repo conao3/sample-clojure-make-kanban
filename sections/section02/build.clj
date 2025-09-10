@@ -1,8 +1,8 @@
 (ns build
   (:require [clojure.tools.build.api :as b]))
 
-(def lib 'kanban/kanban)
-(def main 'kanban.kanban)
+(def lib 'conao3/kanban)
+(def main 'conao3.kanban)
 (def version (format "0.1.%s" (b/git-count-revs nil)))
 (def class-dir "target/classes")
 (def jar-file (format "target/%s.jar" (namespace lib)))
