@@ -14,18 +14,18 @@
 (defn auth-initiate-auth
   "req: :username str :password str"
   [_req]
-  (res/ok (json/write-str
-           {:access-token "asdfasdf"
-            :id-token "asdf"
-            :refresh-token "asdf"})))
+  (res/ok
+   {:access-token "asdfasdf"
+    :id-token "asdf"
+    :refresh-token "asdf"}))
 
 (defn auth-refresh-token
   "req: :refresh-token str"
   [_req]
-  (res/ok (json/write-str
-           {:access-token "asdfasdf"
-            :id-token "asdf"
-            :refresh-token "asdf"})))
+  (res/ok
+   {:access-token "asdfasdf"
+    :id-token "asdf"
+    :refresh-token "asdf"}))
 
 (defn auth-change-password
   "req: :access-token str :previous-password str :proposed-password str"
