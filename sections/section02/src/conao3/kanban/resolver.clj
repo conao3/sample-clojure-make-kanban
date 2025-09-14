@@ -1,7 +1,6 @@
 (ns conao3.kanban.resolver
   (:require
-   [ring.util.http-response :as res]
-   [clojure.data.json :as json]))
+   [ring.util.http-response :as res]))
 
 (defn health [_req]
   (res/ok "ok"))

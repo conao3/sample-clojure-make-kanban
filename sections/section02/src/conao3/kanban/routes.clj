@@ -5,7 +5,9 @@
    [reitit.ring.middleware.muuntaja :as reitit.ring.middleware.muuntaja]
    [reitit.coercion.spec :as reitit.coercion.spec]
    [muuntaja.core :as muuntaja]
-   [conao3.kanban.resolver :as c.resolver]))
+   [muuntaja.middleware :as muuntaja.middleware]
+   [conao3.kanban.resolver :as c.resolver]
+   [conao3.kanban.middleware :as c.middleware]))
 
 (def router
   (reitit.ring/router
@@ -22,6 +24,8 @@
    {:data {:muuntaja muuntaja/instance
            :coercion reitit.coercion.spec/coercion
            :middleware [reitit.ring.middleware.muuntaja/format-middleware
+                        muuntaja.middleware/wrap-params
+                        c.middleware/transform-keys
                         reitit.ring.coercion/coerce-exceptions-middleware
                         reitit.ring.coercion/coerce-request-middleware
                         reitit.ring.coercion/coerce-response-middleware]}}))
