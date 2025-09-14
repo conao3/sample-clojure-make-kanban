@@ -4,6 +4,5 @@
    [conao3.kanban.routes :as c.routes]))
 
 (def handler
-  (-> c.routes/routes
-      reitit.ring/router
+  (-> c.routes/router
       reitit.ring/ring-handler))
