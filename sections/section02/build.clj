@@ -7,7 +7,7 @@
 (def class-dir "target/classes")
 (def jar-file (format "target/%s.jar" (namespace lib)))
 (def uber-file (format "target/%s-standalone.jar" (name lib)))
-(def basis (delay (b/create-basis {:project "deps.edn"})))
+(def basis (delay (b/create-basis)))
 
 (defn jar [_]
   (b/write-pom {:class-dir class-dir
