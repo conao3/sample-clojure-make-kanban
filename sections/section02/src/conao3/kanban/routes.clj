@@ -23,7 +23,7 @@
                            (mapv (fn [[key val]]
                                    (let [m (meta key)]
                                      (conj (dissoc m :method :path)
-                                           {(:method m) val :name key}))))
+                                           {(:method m) val :name (-> key name keyword)}))))
                            (#(conj % common-val))
                            (into {}))])))))
 
