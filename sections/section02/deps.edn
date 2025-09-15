@@ -20,7 +20,8 @@
 
  :aliases
  {:dev {:extra-paths ["dev"]
-        :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}}}
+        :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}
+                     com.stuartsierra/component.repl {:mvn/version "1.0.0"}}}
   :repl {:extra-deps {nrepl/nrepl {:mvn/version "1.4.0"}
                       cider/cider-nrepl {:mvn/version "0.57.0"}}
          :jvm-opts ["-Djdk.attach.allowAttachSelf"]
