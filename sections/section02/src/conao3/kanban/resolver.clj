@@ -4,8 +4,8 @@
 
 (defmulti resolver :name)
 
-(defmethod resolver (with-meta 'api.auth.health
-                      {:method :get :path "/api/auth/health"})
+(defmethod resolver (with-meta 'api.health
+                      {:method :get :path "/api/health"})
   [_req]
   (res/ok "ok"))
 
