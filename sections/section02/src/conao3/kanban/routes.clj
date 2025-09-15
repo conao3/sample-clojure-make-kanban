@@ -10,16 +10,22 @@
    [conao3.kanban.middleware :as c.middleware]))
 
 (def routes
-  [["/api"
-     ["/health" {:get c.resolver/health}]
-     ["/auth"
-      ["/signup" {:post c.resolver/auth-signup}]
-      ["/initiate-auth" {:post c.resolver/auth-initiate-auth}]
-      ["/refresh-token" {:post c.resolver/auth-refresh-token}]
-      ["/change-password" {:post c.resolver/auth-change-password}]
-      ["/forgot-password" {:post c.resolver/auth-forgot-password}]
-      ["/delete-user" {:post c.resolver/auth-delete-user}]]
-     ["/user/:id" {:get c.resolver/user-get :put c.resolver/user-update}]]])
+  (->> c.resolver/resolver
+       methods
+       (group-by (comp :path meta key))
+       (map (fn [[path vals]]
+              (let [common-val (->> vals
+                                    (reduce
+                                     (fn [acc elm]
+                                       (cond-> acc (:name elm) (assoc :name (:name elm))))
+                                     {}))]
+                [path (->> vals
+                           (mapv (fn [[key val]]
+                                   (let [m (meta key)]
+                                     (conj (dissoc m :method :path)
+                                           {(:method m) val :name key}))))
+                           (#(conj % common-val))
+                           (into {}))])))))
 
 (def router
   (-> routes
