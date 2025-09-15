@@ -33,6 +33,7 @@ target/kanban: target/kanban-standalone.jar
 	--features=clj_easy.graal_build_time.InitClojureClasses \
 	--verbose \
 	--no-fallback \
+	--install-exit-handlers \
 	$(GRAAL_BUILD_ARGS) \
 	$@
 
