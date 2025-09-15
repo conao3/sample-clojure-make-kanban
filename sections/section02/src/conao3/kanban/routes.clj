@@ -4,6 +4,8 @@
    [reitit.ring.coercion :as reitit.ring.coercion]
    [reitit.ring.middleware.muuntaja :as reitit.ring.middleware.muuntaja]
    [reitit.coercion.spec :as reitit.coercion.spec]
+   [reitit.dev.pretty :as reitit.dev.pretty]
+   [reitit.spec :as reitit.spec]
    [muuntaja.core :as muuntaja]
    [muuntaja.middleware :as muuntaja.middleware]
    [conao3.kanban.resolver :as c.resolver]
@@ -30,7 +32,9 @@
 (def router
   (-> routes
       (reitit.ring/router
-       {:data {:muuntaja muuntaja/instance
+       {:validate reitit.spec/validate
+        :exception reitit.dev.pretty/exception
+        :data {:muuntaja muuntaja/instance
                :coercion reitit.coercion.spec/coercion
                :middleware [reitit.ring.middleware.muuntaja/format-middleware
                             muuntaja.middleware/wrap-params
