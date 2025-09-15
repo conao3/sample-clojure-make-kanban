@@ -52,13 +52,13 @@
   (res/ok "ok"))
 
 (defmethod resolver (with-meta 'api.user.get
-                      {:method :get :path "/api/user/:id"})
+                      {:name 'api.user :method :get :path "/api/user/:id"})
   [_req]
   "req: :id-token str"
   (res/ok {:name "asdf"}))
 
 (defmethod resolver (with-meta 'api.user.update
-                      {:method :put :path "/api/user/:id"})
+                      {:name 'api.user :method :put :path "/api/user/:id"})
   [_req]
   "req: :id-token str :name str"
   (res/ok "ok"))
