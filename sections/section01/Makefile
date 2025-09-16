@@ -9,11 +9,11 @@ endif
 
 .PHONY: repl
 repl:
-	clj -A:dev:repl
+	clj -M:dev:repl
 
 .PHONY: update
 update:
-	clojure -Sdeps '{:deps {com.github.liquidz/antq {:mvn/version "RELEASE"}}}' -M -m antq.core --upgrade --force
+	clojure -Sdeps '{:deps {org.slf4j/slf4j-simple {:mvn/version "RELEASE"} com.github.liquidz/antq {:mvn/version "RELEASE"}}}' -M -m antq.core --upgrade --force
 
 .PHONY: test
 test:
