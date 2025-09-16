@@ -5,4 +5,5 @@
 
 (def handler
   (-> c.routes/router
-      reitit.ring/ring-handler))
+      (reitit.ring/ring-handler
+       (reitit.ring/redirect-trailing-slash-handler {:method :strip}))))
