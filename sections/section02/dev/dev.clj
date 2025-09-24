@@ -8,3 +8,6 @@
 (apply require clojure.main/repl-requires)
 
 (component.repl/set-init (fn [_] (c.system/new-system)))
+
+#_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
+(def go reset)
