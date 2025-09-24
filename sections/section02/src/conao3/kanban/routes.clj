@@ -1,15 +1,15 @@
 (ns conao3.kanban.routes
   (:require
+   [conao3.kanban.middleware :as c.middleware]
+   [conao3.kanban.resolver :as c.resolver]
+   [muuntaja.core :as muuntaja]
+   [muuntaja.middleware :as muuntaja.middleware]
+   [reitit.coercion.spec :as reitit.coercion.spec]
+   [reitit.dev.pretty :as reitit.dev.pretty]
    [reitit.ring :as reitit.ring]
    [reitit.ring.coercion :as reitit.ring.coercion]
    [reitit.ring.middleware.muuntaja :as reitit.ring.middleware.muuntaja]
-   [reitit.coercion.spec :as reitit.coercion.spec]
-   [reitit.dev.pretty :as reitit.dev.pretty]
-   [reitit.spec :as reitit.spec]
-   [muuntaja.core :as muuntaja]
-   [muuntaja.middleware :as muuntaja.middleware]
-   [conao3.kanban.resolver :as c.resolver]
-   [conao3.kanban.middleware :as c.middleware]))
+   [reitit.spec :as reitit.spec]))
 
 (def routes
   (->> c.resolver/resolver

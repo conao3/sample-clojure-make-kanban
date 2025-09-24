@@ -1,8 +1,8 @@
-(ns conao3.kanban.system 
+(ns conao3.kanban.system
   (:require
+   [com.stuartsierra.component :as component]
    [conao3.kanban.system.handler :as c.system.handler]
-   [conao3.kanban.system.server :as c.system.server]
-   [com.stuartsierra.component :as component]))
+   [conao3.kanban.system.server :as c.system.server]))
 
 (defn new-system []
   (component/system-map

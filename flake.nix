@@ -29,12 +29,23 @@
               graalvm-ce
               (clojure.override { jdk = graalvm-ce; })
               clojure-lsp
+              cljstyle
             ];
           };
 
           treefmt = {
             programs.nixfmt.enable = true;
-            programs.cljfmt.enable = true;
+            settings.formatter.cljstyle = {
+              command = "${pkgs.cljstyle}/bin/cljstyle";
+              options = [ "fix" ];
+              includes = [
+                "*.clj"
+                "*.cljs"
+                "*.cljc"
+                "*.cljx"
+                "*.edn"
+              ];
+            };
           };
         };
     };

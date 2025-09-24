@@ -1,9 +1,9 @@
 (ns conao3.kanban
+  (:gen-class)
   (:require
    [clojure.tools.logging :as log]
-   [conao3.kanban.system :as c.system]
-   [com.stuartsierra.component :as component])
-  (:gen-class))
+   [com.stuartsierra.component :as component]
+   [conao3.kanban.system :as c.system]))
 
 (defn add [a b]
   (+ a b))

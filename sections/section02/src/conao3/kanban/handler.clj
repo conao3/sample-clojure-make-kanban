@@ -1,7 +1,7 @@
 (ns conao3.kanban.handler
   (:require
-   [reitit.ring :as reitit.ring]
-   [conao3.kanban.routes :as c.routes]))
+   [conao3.kanban.routes :as c.routes]
+   [reitit.ring :as reitit.ring]))
 
 (def handler
   (-> c.routes/router

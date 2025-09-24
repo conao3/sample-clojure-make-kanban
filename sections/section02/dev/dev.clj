@@ -1,7 +1,7 @@
+#_{:clj-kondo/ignore [:unused-referred-var]}
 (ns dev
   (:require
    [clojure.main :as clojure.main]
-   #_{:clj-kondo/ignore [:unused-referred-var]}
    [com.stuartsierra.component.repl :as component.repl :refer [system start stop reset initializer]]
    [conao3.kanban.system :as c.system]))
 

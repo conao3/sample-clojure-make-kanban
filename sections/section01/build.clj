@@ -1,5 +1,6 @@
 (ns build
-  (:require [clojure.tools.build.api :as b]))
+  (:require
+   [clojure.tools.build.api :as b]))
 
 (def lib 'conao3/kanban)
 (def main 'conao3.kanban)
