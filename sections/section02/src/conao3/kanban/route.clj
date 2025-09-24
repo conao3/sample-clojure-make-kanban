@@ -1,4 +1,4 @@
-(ns conao3.kanban.routes
+(ns conao3.kanban.route
   (:require
    [conao3.kanban.middleware :as c.middleware]
    [conao3.kanban.resolver :as c.resolver]
