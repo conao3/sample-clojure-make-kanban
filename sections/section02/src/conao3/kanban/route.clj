@@ -11,7 +11,7 @@
    [reitit.ring.middleware.muuntaja :as reitit.ring.middleware.muuntaja]
    [reitit.spec :as reitit.spec]))
 
-(def routes
+(def ^:private routes
   (->> c.resolver/resolver
        methods
        (group-by (comp :path meta key))
