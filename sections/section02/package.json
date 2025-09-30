@@ -1,0 +1,20 @@
+{
+  "name": "kanban",
+  "version": "1.0.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@10.17.1",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "scheduler": "^0.26.0"
+  },
+  "devDependencies": {
+    "shadow-cljs": "^3.2.1"
+  },
+  "pnpm": {
+    "executionEnv": {
+      "nodeVersion": "24.9.0"
+    }
+  }
+}
