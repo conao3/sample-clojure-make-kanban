@@ -1,8 +1,8 @@
-(ns conao3.kanban.system-test 
+(ns conao3.kanban.system-test
   (:require
-    [clojure.test :as t]
-    [com.stuartsierra.component :as component]
-    [conao3.kanban.system :as c.system]))
+   [clojure.test :as t]
+   [com.stuartsierra.component :as component]
+   [conao3.kanban.system :as c.system]))
 
 (def system nil)
 
