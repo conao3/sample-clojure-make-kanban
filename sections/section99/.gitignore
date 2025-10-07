@@ -1,0 +1,7 @@
+/.cpcache
+/.clj-kondo
+/.lsp
+/node_modules
+/.shadow-cljs
+/.nrepl-port
+/dist
