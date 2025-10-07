@@ -30,6 +30,8 @@
               (clojure.override { jdk = graalvm-ce; })
               clojure-lsp
               cljstyle
+              nodejs_22
+              pnpm_10
             ];
           };
 

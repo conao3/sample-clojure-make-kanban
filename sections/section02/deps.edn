@@ -9,6 +9,13 @@
   metosin/ring-http-response {:mvn/version "0.9.5"}
   camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.3"}
   com.stuartsierra/component {:mvn/version "1.1.0"}
+
+  ;; cljs
+  org.clojure/clojurescript {:mvn/version "1.12.42"}
+  thheller/shadow-cljs {:mvn/version "3.2.1"}
+  reagent/reagent {:mvn/version "2.0.0-alpha3"}
+
+  ;; graal
   com.github.clj-easy/graal-config-slf4j-simple
   ;; {:git/url "https://github.com/clj-easy/graal-config"
   ;;  :git/sha "9983117c292f5f29375a4009e9390a0ab6ddb7eb"
