@@ -1,0 +1,4 @@
+^{:auto-bundle :webpack}
+{:main conao3.kanban.cljs.kanban
+ :output-dir "resources/public/dist/js"
+ :optimizations :advanced}

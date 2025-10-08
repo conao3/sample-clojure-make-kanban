@@ -1,7 +1,7 @@
-((nil . ((cider-preferred-build-tool . shadow-cljs)
-         (cider-default-cljs-repl . shadow)
-         (cider-shadow-watched-builds . ("app"))
-         (cider-shadow-cljs-command . "pnpm exec shadow-cljs")
+((nil . ((cider-preferred-build-tool . clojure-cli)
+         (cider-clojure-cli-aliases . ":dev:nrepl")
+         (cider-default-cljs-repl . figwheel-main)
+         (cider-figwheel-main-default-options . "dev")
          (cider-offer-to-open-cljs-app-in-browser . nil)
 
          (cider-ns-refresh-before-fn . "com.stuartsierra.component.repl/stop")
