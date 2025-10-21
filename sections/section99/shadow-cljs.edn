@@ -6,6 +6,6 @@
   {:target :browser
    :output-dir "resources-dev/public/dist/js"
    :modules
-   {:mainqqq
+   {:main
     {:init-fn conao3.kanban.cljs.kanban/start}}
    :release {:output-dir "resources/public/dist/js"}}}}
