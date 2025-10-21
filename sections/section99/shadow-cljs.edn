@@ -5,7 +5,7 @@
  {:app
   {:target :browser
    :output-dir "resources-dev/public/dist/js"
+   :release {:output-dir "resources/public/dist/js"}
    :modules
    {:main
-    {:init-fn conao3.kanban.cljs.kanban/start}}
-   :release {:output-dir "resources/public/dist/js"}}}}
+    {:init-fn conao3.kanban.cljs.kanban/start}}}}}
