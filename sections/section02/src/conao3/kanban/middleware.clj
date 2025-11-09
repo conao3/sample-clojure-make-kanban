@@ -11,3 +11,11 @@
       (cond-> res
         (map? (:body res))
         (update :body (partial cske/transform-keys csk/->camelCase))))))
+
+(defn wrap-schema [handler schema]
+  (fn [request]
+    (handler (assoc request :schema schema))))
+
+(defn wrap-db [handler db]
+  (fn [request]
+    (handler (assoc request :db db))))

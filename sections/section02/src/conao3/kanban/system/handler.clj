@@ -4,14 +4,19 @@
    [com.stuartsierra.component :as component]
    [conao3.kanban.handler :as c.handler]))
 
-(defrecord Handler [handler]
+(defrecord Handler [handler schema]
   component/Lifecycle
   (start [this]
     (log/info "Starting Handler...")
-    (log/info "Started Handler")
-    (assoc this :handler c.handler/handler))
+    (let [schema (c.handler/compile-schema)]
+      (log/info "Started Handler")
+      (assoc this
+             :handler c.handler/handler
+             :schema schema)))
 
   (stop [this]
     (log/info "Stopping Handler...")
     (log/info "Stopped Handler")
-    (assoc this :handler nil)))
+    (assoc this
+           :handler nil
+           :schema nil)))

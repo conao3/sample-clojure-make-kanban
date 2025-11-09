@@ -1,0 +1,42 @@
+{:objects
+ {:Task
+  {:fields
+   {:task_id {:type (non-null String)}
+    :title {:type (non-null String)}
+    :status {:type (non-null String)}
+    :created_at {:type String}
+    :updated_at {:type String}}}}
+
+ :queries
+ {:tasks
+  {:type (list :Task)
+   :resolve :query/tasks}
+
+  :task
+  {:type :Task
+   :args {:task_id {:type (non-null String)}}
+   :resolve :query/task}
+
+  :tasks_by_status
+  {:type (list :Task)
+   :args {:status {:type (non-null String)}}
+   :resolve :query/tasks-by-status}}
+
+ :mutations
+ {:create_task
+  {:type :Task
+   :args {:title {:type (non-null String)}
+          :status {:type (non-null String)}}
+   :resolve :mutation/create-task}
+
+  :update_task
+  {:type :Task
+   :args {:task_id {:type (non-null String)}
+          :title {:type String}
+          :status {:type String}}
+   :resolve :mutation/update-task}
+
+  :delete_task
+  {:type :Task
+   :args {:task_id {:type (non-null String)}}
+   :resolve :mutation/delete-task}}}

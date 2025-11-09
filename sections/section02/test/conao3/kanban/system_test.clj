@@ -7,7 +7,7 @@
 (def system nil)
 
 (defn system-fixture [f]
-  (alter-var-root #'system (constantly (-> (c.system/new-system) (dissoc :server))))
+  (alter-var-root #'system (constantly (-> (c.system/new-system :dev) (dissoc :server))))
   (alter-var-root #'system component/start-system)
   (f)
   (alter-var-root #'system component/stop-system)
@@ -17,5 +17,5 @@
 
 (t/deftest system-test
   (t/is (= {:status 200 :headers {} :body "ok"}
-           ((-> system :handler :handler)
+           ((-> system :app :app)
             {:request-method :get :uri "/api/health"}))))

@@ -15,6 +15,7 @@
   (stop [this]
     (log/info "Stopping Db...")
     (when datasource
-      (.close ^java.lang.AutoCloseable datasource))
+      (when (instance? java.lang.AutoCloseable datasource)
+        (.close ^java.lang.AutoCloseable datasource)))
     (log/info "Stopped Db")
     (assoc this :datasource nil)))

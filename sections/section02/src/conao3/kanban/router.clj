@@ -1,7 +1,6 @@
 (ns conao3.kanban.router
   (:require
    [conao3.kanban.middleware :as c.middleware]
-   [conao3.kanban.resolver :as c.resolver]
    [muuntaja.core :as muuntaja]
    [muuntaja.middleware :as muuntaja.middleware]
    [reitit.coercion.spec :as reitit.coercion.spec]
@@ -11,34 +10,34 @@
    [reitit.ring.middleware.muuntaja :as reitit.ring.middleware.muuntaja]
    [reitit.spec :as reitit.spec]))
 
-(def ^:private routes
-  (->> c.resolver/resolver
-       methods
-       (group-by (comp :path meta key))
-       (map (fn [[path vals]]
-              (let [common-val (->> vals
-                                    (reduce
-                                     (fn [acc elm]
-                                       (cond-> acc (:name elm) (assoc :name (:name elm))))
-                                     {}))]
-                [path (->> vals
-                           (mapv (fn [[key val]]
-                                   (let [m (meta key)]
-                                     (conj (dissoc m :method :path)
-                                           {(:method m) val :name (-> key name keyword)}))))
-                           (#(conj % common-val))
-                           (into {}))])))))
-
-(def router
-  (-> routes
-      (reitit.ring/router
-       {:validate reitit.spec/validate
-        :exception reitit.dev.pretty/exception
-        :data {:muuntaja muuntaja/instance
-               :coercion reitit.coercion.spec/coercion
-               :middleware [reitit.ring.middleware.muuntaja/format-middleware
-                            muuntaja.middleware/wrap-params
-                            c.middleware/transform-keys
-                            reitit.ring.coercion/coerce-exceptions-middleware
-                            reitit.ring.coercion/coerce-request-middleware
-                            reitit.ring.coercion/coerce-response-middleware]}})))
+(defn make-routes [handler schema db]
+  (let [routes (->> handler
+                    methods
+                    (group-by (comp :path meta key))
+                    (map (fn [[path vals]]
+                           (let [common-val (->> vals
+                                                 (reduce
+                                                  (fn [acc elm]
+                                                    (cond-> acc (:name elm) (assoc :name (:name elm))))
+                                                  {}))]
+                             [path (->> vals
+                                        (mapv (fn [[key val]]
+                                                (let [m (meta key)]
+                                                  (conj (dissoc m :method :path)
+                                                        {(:method m) val :name (-> key name keyword)}))))
+                                        (#(conj % common-val))
+                                        (into {}))]))))]
+    (-> routes
+        (reitit.ring/router
+         {:validate reitit.spec/validate
+          :exception reitit.dev.pretty/exception
+          :data {:muuntaja muuntaja/instance
+                 :coercion reitit.coercion.spec/coercion
+                 :middleware [[c.middleware/wrap-schema schema]
+                              [c.middleware/wrap-db db]
+                              reitit.ring.middleware.muuntaja/format-middleware
+                              muuntaja.middleware/wrap-params
+                              c.middleware/transform-keys
+                              reitit.ring.coercion/coerce-exceptions-middleware
+                              reitit.ring.coercion/coerce-request-middleware
+                              reitit.ring.coercion/coerce-response-middleware]}}))))
