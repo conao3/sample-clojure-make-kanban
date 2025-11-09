@@ -40,6 +40,7 @@ target/kanban: target/kanban-standalone.jar
 .PHONY: db-migrate
 db-migrate:
 	PGPASSWORD=kanban psqldef -U kanban -h localhost -p 15432 kanban < schema.sql
+	PGPASSWORD=kanban psqldef -U kanban -h localhost -p 15432 kanban_test < schema.sql
 
 .PHONY: db-migrate-dry-run
 db-migrate-dry-run:

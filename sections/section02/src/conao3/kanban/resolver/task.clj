@@ -3,10 +3,12 @@
    [honey.sql :as sql]
    [honey.sql.helpers :as h]
    [malli.experimental :as mx]
-   [next.jdbc :as jdbc]))
+   [next.jdbc :as jdbc]
+   [next.jdbc.result-set :as rs]))
 
 (def Task
   [:map
+   [:id :string]
    [:task-id :uuid]
    [:title :string]
    [:status :string]
@@ -37,7 +39,7 @@
 (def Parent :any)
 
 (mx/defn task-id :- :string
-  [task-id :- :string]
+  [task-id :- :any]
   (str "Task:" task-id))
 
 (mx/defn tasks :- [:vector Task]
@@ -45,24 +47,26 @@
    _args :- :map
    _parent :- Parent]
   (let [db (-> context :db)]
-    (->> (-> (h/select :*)
-             (h/from :task)
-             (h/order-by [:created_at :desc])
-             sql/format)
-         (jdbc/execute! db)
-         (map #(-> % (assoc :id (task-id (:task-id %))))))))
+    (->> (jdbc/execute! db
+                        (-> (h/select :*)
+                            (h/from :task)
+                            (h/order-by [:created_at :desc])
+                            sql/format)
+                        {:builder-fn rs/as-unqualified-kebab-maps})
+         (mapv #(-> % (assoc :id (task-id (:task-id %))))))))
 
 (mx/defn task :- [:maybe Task]
   [context :- Context
    args :- TaskId
    _parent :- Parent]
   (let [db (-> context :db)
-        task-id (:task-id args)
-        res (->> (-> (h/select :*)
-                     (h/from :task)
-                     (h/where [:= :task_id [:cast task-id :uuid]])
-                     sql/format)
-                 (jdbc/execute-one! db))]
+        tid (:task-id args)
+        res (jdbc/execute-one! db
+                               (-> (h/select :*)
+                                   (h/from :task)
+                                   (h/where [:= :task_id [:cast tid :uuid]])
+                                   sql/format)
+                               {:builder-fn rs/as-unqualified-kebab-maps})]
     (some-> res (assoc :id (task-id (:task-id res))))))
 
 (mx/defn tasks-by-status :- [:vector Task]
@@ -71,13 +75,14 @@
    _parent :- Parent]
   (let [db (-> context :db)
         status (:status args)]
-    (->> (-> (h/select :*)
-             (h/from :task)
-             (h/where [:= :status status])
-             (h/order-by [:created_at :desc])
-             sql/format)
-         (jdbc/execute! db)
-         (map #(-> % (assoc :id (task-id (:task-id %))))))))
+    (->> (jdbc/execute! db
+                        (-> (h/select :*)
+                            (h/from :task)
+                            (h/where [:= :status status])
+                            (h/order-by [:created_at :desc])
+                            sql/format)
+                        {:builder-fn rs/as-unqualified-kebab-maps})
+         (mapv #(-> % (assoc :id (task-id (:task-id %))))))))
 
 (mx/defn create-task :- Task
   [context :- Context
@@ -85,42 +90,46 @@
    _parent :- Parent]
   (let [db (-> context :db)
         {:keys [title status]} args
-        res (->> (-> (h/insert-into :task)
-                     (h/values [{:title title :status status}])
-                     (h/returning :*)
-                     sql/format)
-                 (jdbc/execute-one! db))]
-    (-> res (assoc :id (task-id (:task/task_id res))))))
+        res (jdbc/execute-one! db
+                               (-> (h/insert-into :task)
+                                   (h/values [{:title title :status status}])
+                                   (h/returning :*)
+                                   sql/format)
+                               {:builder-fn rs/as-unqualified-kebab-maps})]
+    (-> res (assoc :id (task-id (:task-id res))))))
 
 (mx/defn update-task :- Task
   [context :- Context
    args :- TaskUpdate
    _parent :- Parent]
   (let [db (-> context :db)
-        {:keys [task-id title status]} args
+        {:keys [title status]} args
+        tid (:task-id args)
         updates (cond-> {}
                   title (assoc :title title)
                   status (assoc :status status))
-        res (->> (-> (h/update :task)
-                     (h/set updates)
-                     (h/where [:= :task_id [:cast task-id :uuid]])
-                     (h/returning :*)
-                     sql/format)
-                 (jdbc/execute-one! db))]
-    (-> res (assoc :id (task-id (:task/task_id res))))))
+        res (jdbc/execute-one! db
+                               (-> (h/update :task)
+                                   (h/set updates)
+                                   (h/where [:= :task_id [:cast tid :uuid]])
+                                   (h/returning :*)
+                                   sql/format)
+                               {:builder-fn rs/as-unqualified-kebab-maps})]
+    (-> res (assoc :id (task-id (:task-id res))))))
 
 (mx/defn delete-task :- Task
   [context :- Context
    args :- TaskId
    _parent :- Parent]
   (let [db (-> context :db)
-        task-id (:task-id args)
-        res (->> (-> (h/delete-from :task)
-                     (h/where [:= :task_id [:cast task-id :uuid]])
-                     (h/returning :*)
-                     sql/format)
-                 (jdbc/execute-one! db))]
-    (-> res (assoc :id (task-id (:task/task_id res))))))
+        tid (:task-id args)
+        res (jdbc/execute-one! db
+                               (-> (h/delete-from :task)
+                                   (h/where [:= :task_id [:cast tid :uuid]])
+                                   (h/returning :*)
+                                   sql/format)
+                               {:builder-fn rs/as-unqualified-kebab-maps})]
+    (-> res (assoc :id (task-id (:task-id res))))))
 
 (def resolvers
   {:Query/tasks tasks
