@@ -2,6 +2,7 @@
   (:require
    [camel-snake-kebab.core :as csk]
    [camel-snake-kebab.extras :as cske]
+   [conao3.kanban.util :as c.util]
    [honey.sql :as sql]
    [honey.sql.helpers :as h]
    [malli.experimental :as mx]
@@ -48,8 +49,9 @@
              (h/order-by [:created_at :desc])
              sql/format)
          (jdbc/execute! db)
-         (mapv #(let [transformed (cske/transform-keys csk/->camelCaseKeyword %)]
-                  (assoc transformed :id (str "Task:" (:taskId transformed))))))))
+         (map #(-> %
+                   (c.util/walk-update-keys csk/->camelCaseKeyword)
+                   (assoc :id (str "Task:" (:task-id %))))))))
 
 (mx/defn task :- [:maybe Task]
   [context :- Context
@@ -57,14 +59,14 @@
    _parent :- Parent]
   (let [db (-> context :db)
         task-id (:task-id args)
-        result (->> (-> (h/select :*)
-                        (h/from :task)
-                        (h/where [:= :task_id [:cast task-id :uuid]])
-                        sql/format)
-                    (jdbc/execute-one! db))]
-    (when result
-      (let [transformed (cske/transform-keys csk/->camelCaseKeyword result)]
-        (assoc transformed :id (str "Task:" (:taskId transformed)))))))
+        res (->> (-> (h/select :*)
+                     (h/from :task)
+                     (h/where [:= :task_id [:cast task-id :uuid]])
+                     sql/format)
+                 (jdbc/execute-one! db))]
+    (some-> res
+            (c.util/walk-update-keys csk/->camelCaseKeyword)
+            (assoc :id (str "Task:" (:task-id res))))))
 
 (mx/defn tasks-by-status :- [:vector Task]
   [context :- Context
@@ -78,8 +80,9 @@
              (h/order-by [:created_at :desc])
              sql/format)
          (jdbc/execute! db)
-         (mapv #(let [transformed (cske/transform-keys csk/->camelCaseKeyword %)]
-                  (assoc transformed :id (str "Task:" (:taskId transformed))))))))
+         (map #(-> %
+                   (c.util/walk-update-keys csk/->camelCaseKeyword)
+                   (assoc :id (str "Task:" (:task-id %))))))))
 
 (mx/defn create-task :- Task
   [context :- Context
@@ -87,13 +90,14 @@
    _parent :- Parent]
   (let [db (-> context :db)
         {:keys [title status]} args
-        transformed (->> (-> (h/insert-into :task)
-                             (h/values [{:title title :status status}])
-                             (h/returning :*)
-                             sql/format)
-                         (jdbc/execute-one! db)
-                         (cske/transform-keys csk/->camelCaseKeyword))]
-    (assoc transformed :id (str "Task:" (:taskId transformed)))))
+        res (->> (-> (h/insert-into :task)
+                     (h/values [{:title title :status status}])
+                     (h/returning :*)
+                     sql/format)
+                 (jdbc/execute-one! db))]
+    (-> res
+        (c.util/walk-update-keys csk/->camelCaseKeyword)
+        (assoc :id (str "Task:" (:task-id res))))))
 
 (mx/defn update-task :- Task
   [context :- Context
@@ -104,14 +108,15 @@
         updates (cond-> {}
                   title (assoc :title title)
                   status (assoc :status status))
-        transformed (->> (-> (h/update :task)
-                             (h/set updates)
-                             (h/where [:= :task_id [:cast task-id :uuid]])
-                             (h/returning :*)
-                             sql/format)
-                         (jdbc/execute-one! db)
-                         (cske/transform-keys csk/->camelCaseKeyword))]
-    (assoc transformed :id (str "Task:" (:taskId transformed)))))
+        res (->> (-> (h/update :task)
+                     (h/set updates)
+                     (h/where [:= :task_id [:cast task-id :uuid]])
+                     (h/returning :*)
+                     sql/format)
+                 (jdbc/execute-one! db))]
+    (-> res
+        (c.util/walk-update-keys csk/->camelCaseKeyword)
+        (assoc :id (str "Task:" (:task-id res))))))
 
 (mx/defn delete-task :- Task
   [context :- Context
@@ -119,13 +124,14 @@
    _parent :- Parent]
   (let [db (-> context :db)
         task-id (:task-id args)
-        transformed (->> (-> (h/delete-from :task)
-                             (h/where [:= :task_id [:cast task-id :uuid]])
-                             (h/returning :*)
-                             sql/format)
-                         (jdbc/execute-one! db)
-                         (cske/transform-keys csk/->camelCaseKeyword))]
-    (assoc transformed :id (str "Task:" (:taskId transformed)))))
+        res (->> (-> (h/delete-from :task)
+                     (h/where [:= :task_id [:cast task-id :uuid]])
+                     (h/returning :*)
+                     sql/format)
+                 (jdbc/execute-one! db))]
+    (-> res
+        (c.util/walk-update-keys csk/->camelCaseKeyword)
+        (assoc :id (str "Task:" (:task-id res))))))
 
 (def resolvers
   {:Query/tasks tasks
