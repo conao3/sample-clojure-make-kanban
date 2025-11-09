@@ -32,6 +32,7 @@
               cljstyle
               nodejs_22
               pnpm_10
+              sqldef
             ];
           };
 

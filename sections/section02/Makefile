@@ -37,6 +37,14 @@ target/kanban: target/kanban-standalone.jar
 	$(GRAAL_BUILD_ARGS) \
 	$@
 
+.PHONY: db-migrate
+db-migrate:
+	PGPASSWORD=kanban psqldef -U kanban -h localhost -p 15432 kanban < schema.sql
+
+.PHONY: db-migrate-dry-run
+db-migrate-dry-run:
+	PGPASSWORD=kanban psqldef -U kanban -h localhost -p 15432 --dry-run kanban < schema.sql
+
 .PHONY: clean
 clean:
 	rm -rf target
