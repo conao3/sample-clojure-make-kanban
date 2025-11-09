@@ -3,11 +3,13 @@
   (:require
    [clojure.main :as clojure.main]
    [com.stuartsierra.component.repl :as component.repl :refer [system start stop reset initializer]]
-   [conao3.kanban.system :as c.system]))
+   [conao3.kanban.system :as c.system]
+   [malli.instrument :as malli.instrument]))
 
 (apply require clojure.main/repl-requires)
 
 (component.repl/set-init (fn [_] (c.system/new-system :dev)))
+(malli.instrument/instrument!)
 
 #_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
 (def go reset)

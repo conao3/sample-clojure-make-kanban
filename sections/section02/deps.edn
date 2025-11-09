@@ -15,6 +15,7 @@
   aero/aero {:mvn/version "1.1.6"}
   com.walmartlabs/lacinia {:mvn/version "1.2.2"}
   superlifter/superlifter {:mvn/version "0.1.6"}
+  metosin/malli {:mvn/version "0.20.0-alpha3"}
 
   ;; cljs
   org.clojure/clojurescript {:mvn/version "1.12.42"}

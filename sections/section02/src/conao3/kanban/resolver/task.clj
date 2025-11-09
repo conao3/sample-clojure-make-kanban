@@ -2,9 +2,44 @@
   (:require
    [honey.sql :as sql]
    [honey.sql.helpers :as h]
+   [malli.experimental :as mx]
    [next.jdbc :as jdbc]))
 
-(defn tasks [context _args _parent]
+(def Task
+  [:map
+   [:task_id :uuid]
+   [:title :string]
+   [:status :string]
+   [:created_at inst?]
+   [:updated_at inst?]])
+
+(def TaskInput
+  [:map
+   [:title :string]
+   [:status :string]])
+
+(def TaskUpdate
+  [:map
+   [:task_id :string]
+   [:title {:optional true} :string]
+   [:status {:optional true} :string]])
+
+(def TaskId
+  [:map
+   [:task_id :string]])
+
+(def TaskStatus
+  [:map
+   [:status :string]])
+
+(def Context :map)
+
+(def Parent :any)
+
+(mx/defn tasks :- [:vector Task]
+  [context :- Context
+   _args :- :map
+   _parent :- Parent]
   (let [datasource (-> context :db :datasource)]
     (->> (-> (h/select :*)
              (h/from :task)
@@ -12,7 +47,10 @@
              sql/format)
          (jdbc/execute! datasource))))
 
-(defn task [context args _parent]
+(mx/defn task :- [:maybe Task]
+  [context :- Context
+   args :- TaskId
+   _parent :- Parent]
   (let [datasource (-> context :db :datasource)
         task-id (:task_id args)]
     (->> (-> (h/select :*)
@@ -21,7 +59,10 @@
              sql/format)
          (jdbc/execute-one! datasource))))
 
-(defn tasks-by-status [context args _parent]
+(mx/defn tasks-by-status :- [:vector Task]
+  [context :- Context
+   args :- TaskStatus
+   _parent :- Parent]
   (let [datasource (-> context :db :datasource)
         status (:status args)]
     (->> (-> (h/select :*)
@@ -31,7 +72,10 @@
              sql/format)
          (jdbc/execute! datasource))))
 
-(defn create-task [context args _parent]
+(mx/defn create-task :- Task
+  [context :- Context
+   args :- TaskInput
+   _parent :- Parent]
   (let [datasource (-> context :db :datasource)
         {:keys [title status]} args]
     (->> (-> (h/insert-into :task)
@@ -40,7 +84,10 @@
              sql/format)
          (jdbc/execute-one! datasource))))
 
-(defn update-task [context args _parent]
+(mx/defn update-task :- Task
+  [context :- Context
+   args :- TaskUpdate
+   _parent :- Parent]
   (let [datasource (-> context :db :datasource)
         {:keys [task_id title status]} args
         updates (cond-> {}
@@ -53,7 +100,10 @@
              sql/format)
          (jdbc/execute-one! datasource))))
 
-(defn delete-task [context args _parent]
+(mx/defn delete-task :- Task
+  [context :- Context
+   args :- TaskId
+   _parent :- Parent]
   (let [datasource (-> context :db :datasource)
         task-id (:task_id args)]
     (->> (-> (h/delete-from :task)
