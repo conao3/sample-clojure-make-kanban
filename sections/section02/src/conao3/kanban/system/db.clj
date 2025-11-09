@@ -4,18 +4,18 @@
    [com.stuartsierra.component :as component]
    [next.jdbc :as jdbc]))
 
-(defrecord Db [datasource db-spec]
+(defrecord Db [db db-spec]
   component/Lifecycle
   (start [this]
     (log/info "Starting Db...")
     (let [ds (jdbc/get-datasource db-spec)]
       (log/info "Started Db")
-      (assoc this :datasource ds)))
+      (assoc this :db ds)))
 
   (stop [this]
     (log/info "Stopping Db...")
-    (when datasource
-      (when (instance? java.lang.AutoCloseable datasource)
-        (.close ^java.lang.AutoCloseable datasource)))
+    (when db
+      (when (instance? java.lang.AutoCloseable db)
+        (.close ^java.lang.AutoCloseable db)))
     (log/info "Stopped Db")
-    (assoc this :datasource nil)))
+    (assoc this :db nil)))
