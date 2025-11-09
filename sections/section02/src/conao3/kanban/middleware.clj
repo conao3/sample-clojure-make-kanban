@@ -10,7 +10,9 @@
                          (update :params (partial cske/transform-keys csk/->kebab-case))))]
       (cond-> res
         (map? (:body res))
-        (update :body (partial cske/transform-keys csk/->camelCase))))))
+        (update :body (partial cske/transform-keys
+                               (fn [x]
+                                 (str (re-find #"_*" (name x)) (csk/->camelCase (name x))))))))))
 
 (defn wrap-schema [handler schema]
   (fn [request]
