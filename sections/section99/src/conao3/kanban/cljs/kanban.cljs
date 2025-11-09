@@ -1,5 +1,6 @@
 (ns conao3.kanban.cljs.kanban
-  (:require [reagent.dom.client :as reagent.dom.client]))
+  (:require
+   [reagent.dom.client :as reagent.dom.client]))
 
 (enable-console-print!)
 
