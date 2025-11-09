@@ -1,10 +1,12 @@
 (ns conao3.kanban.handler
   (:require
+   [camel-snake-kebab.core :as csk]
    [clojure.java.io :as io]
    [com.walmartlabs.lacinia :as lacinia]
    [com.walmartlabs.lacinia.parser.schema :as parser.schema]
    [com.walmartlabs.lacinia.schema :as schema]
    [conao3.kanban.resolver.task :as c.resolver.task]
+   [conao3.kanban.util :as c.util]
    [ring.util.http-response :as res]))
 
 (defmulti handler :name)
@@ -21,9 +23,9 @@
            field-key (name resolver-key)
            type-keyword (keyword type-key)
            field-keyword (keyword field-key)]
-       (update-in acc [:objects type-keyword :fields field-keyword]
-                  (fn [field]
-                    (assoc field :resolve resolver-fn)))))
+       (assoc-in acc [:objects type-keyword :fields field-keyword :resolve]
+                 (fn [context args parent]
+                   (resolver-fn context (c.util/walk-update-keys args csk/->kebab-case) parent)))))
    schema
    resolvers))
 
@@ -44,7 +46,8 @@
         variables (or (:variables body) {})
         operation-name (:operationName body)
         context {:db (:db db)}
-        result (lacinia/execute schema query variables context {:operation-name operation-name})]
+        result (-> (lacinia/execute schema query variables context {:operation-name operation-name})
+                   (c.util/walk-update-keys csk/->camelCase))]
     (if (:errors result)
       (res/bad-request result)
       (res/ok result))))

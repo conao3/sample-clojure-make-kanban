@@ -1,7 +1,5 @@
 (ns conao3.kanban.resolver.task
   (:require
-   [camel-snake-kebab.core :as csk]
-   [conao3.kanban.util :as c.util]
    [honey.sql :as sql]
    [honey.sql.helpers :as h]
    [malli.experimental :as mx]
@@ -48,9 +46,7 @@
              (h/order-by [:created_at :desc])
              sql/format)
          (jdbc/execute! db)
-         (map #(-> %
-                   (c.util/walk-update-keys csk/->camelCaseKeyword)
-                   (assoc :id (str "Task:" (:task-id %))))))))
+         (map #(-> % (assoc :id (str "Task:" (:task-id %))))))))
 
 (mx/defn task :- [:maybe Task]
   [context :- Context
@@ -63,9 +59,7 @@
                      (h/where [:= :task_id [:cast task-id :uuid]])
                      sql/format)
                  (jdbc/execute-one! db))]
-    (some-> res
-            (c.util/walk-update-keys csk/->camelCaseKeyword)
-            (assoc :id (str "Task:" (:task-id res))))))
+    (some-> res (assoc :id (str "Task:" (:task-id res))))))
 
 (mx/defn tasks-by-status :- [:vector Task]
   [context :- Context
@@ -79,9 +73,7 @@
              (h/order-by [:created_at :desc])
              sql/format)
          (jdbc/execute! db)
-         (map #(-> %
-                   (c.util/walk-update-keys csk/->camelCaseKeyword)
-                   (assoc :id (str "Task:" (:task-id %))))))))
+         (map #(-> % (assoc :id (str "Task:" (:task-id %))))))))
 
 (mx/defn create-task :- Task
   [context :- Context
@@ -94,9 +86,7 @@
                      (h/returning :*)
                      sql/format)
                  (jdbc/execute-one! db))]
-    (-> res
-        (c.util/walk-update-keys csk/->camelCaseKeyword)
-        (assoc :id (str "Task:" (:task-id res))))))
+    (-> res (assoc :id (str "Task:" (:task-id res))))))
 
 (mx/defn update-task :- Task
   [context :- Context
@@ -113,9 +103,7 @@
                      (h/returning :*)
                      sql/format)
                  (jdbc/execute-one! db))]
-    (-> res
-        (c.util/walk-update-keys csk/->camelCaseKeyword)
-        (assoc :id (str "Task:" (:task-id res))))))
+    (-> res (assoc :id (str "Task:" (:task/task_id res))))))
 
 (mx/defn delete-task :- Task
   [context :- Context
@@ -128,9 +116,7 @@
                      (h/returning :*)
                      sql/format)
                  (jdbc/execute-one! db))]
-    (-> res
-        (c.util/walk-update-keys csk/->camelCaseKeyword)
-        (assoc :id (str "Task:" (:task-id res))))))
+    (-> res (assoc :id (str "Task:" (:task-id res))))))
 
 (def resolvers
   {:Query/tasks tasks
