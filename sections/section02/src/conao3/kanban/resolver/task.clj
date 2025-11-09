@@ -1,7 +1,6 @@
 (ns conao3.kanban.resolver.task
   (:require
    [camel-snake-kebab.core :as csk]
-   [camel-snake-kebab.extras :as cske]
    [conao3.kanban.util :as c.util]
    [honey.sql :as sql]
    [honey.sql.helpers :as h]
