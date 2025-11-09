@@ -1,14 +1,17 @@
 {:paths ["src" "resources"]
  :deps
- {org.clojure/clojure {:mvn/version "1.12.2"}
+ {org.clojure/clojure {:mvn/version "1.12.3"}
   org.clojure/tools.logging {:mvn/version "1.3.0"}
   org.clojure/data.json {:mvn/version "2.5.1"}
   org.slf4j/slf4j-simple {:mvn/version "2.0.17"}
   http-kit/http-kit {:mvn/version "2.8.1"}
-  metosin/reitit {:mvn/version "0.9.1"}
+  metosin/reitit {:mvn/version "0.9.2"}
   metosin/ring-http-response {:mvn/version "0.9.5"}
   camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.3"}
-  com.stuartsierra/component {:mvn/version "1.1.0"}
+  com.stuartsierra/component {:mvn/version "1.2.0"}
+  com.github.seancorfield/next.jdbc {:mvn/version "1.3.1070"}
+  com.github.seancorfield/honeysql {:mvn/version "2.7.1350"}
+  org.postgresql/postgresql {:mvn/version "42.7.8"}
 
   ;; cljs
   org.clojure/clojurescript {:mvn/version "1.12.42"}
@@ -21,7 +24,7 @@
   ;;  :git/sha "9983117c292f5f29375a4009e9390a0ab6ddb7eb"
   ;;  :deps/root "config/org.slf4j/slf4j-simple"}
   {:git/url "https://github.com/conao3/graal-config"
-   :git/sha "fb0b0734d07d6d73baa4641457312d5d2f887811"
+   :git/sha "9983117c292f5f29375a4009e9390a0ab6ddb7eb"
    :deps/root "config/org.slf4j/slf4j-simple"}
   com.github.clj-easy/graal-build-time {:mvn/version "1.0.5"}}
 
@@ -29,14 +32,14 @@
  {:dev {:extra-paths ["dev" "resources-dev"]
         :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}
                      com.stuartsierra/component.repl {:mvn/version "1.0.0"}}}
-  :nrepl {:extra-deps {nrepl/nrepl {:mvn/version "1.4.0"}
-                       cider/cider-nrepl {:mvn/version "0.57.0"}
+  :nrepl {:extra-deps {nrepl/nrepl {:mvn/version "1.5.1"}
+                       cider/cider-nrepl {:mvn/version "0.58.0"}
                        cider/piggieback {:mvn/version "0.6.1"}}
          :jvm-opts ["-Djdk.attach.allowAttachSelf"]}
   :repl {:main-opts ["-m" "nrepl.cmdline"
                      "--interactive"
                      "--middleware" "[cider.nrepl/cider-middleware,cider.piggieback/wrap-cljs-repl]"]}
   :test {:main-opts ["-e" "(require 'dev)" "-m" "kaocha.runner"]}
-  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.10"}}
+  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.11"}}
           :ns-default build
           :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}}}
