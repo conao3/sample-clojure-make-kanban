@@ -1,0 +1,24 @@
+type Task {
+  taskId: String!
+  title: String!
+  status: String!
+  createdAt: String
+  updatedAt: String
+}
+
+type Query {
+  tasks: [Task]
+  task(taskId: String!): Task
+  tasksByStatus(status: String!): [Task]
+}
+
+type Mutation {
+  createTask(title: String!, status: String!): Task
+  updateTask(taskId: String!, title: String, status: String): Task
+  deleteTask(taskId: String!): Task
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}

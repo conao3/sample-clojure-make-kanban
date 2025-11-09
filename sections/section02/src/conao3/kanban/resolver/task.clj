@@ -1,5 +1,7 @@
 (ns conao3.kanban.resolver.task
   (:require
+   [camel-snake-kebab.core :as csk]
+   [camel-snake-kebab.extras :as cske]
    [honey.sql :as sql]
    [honey.sql.helpers :as h]
    [malli.experimental :as mx]
@@ -7,11 +9,11 @@
 
 (def Task
   [:map
-   [:task_id :uuid]
+   [:task-id :uuid]
    [:title :string]
    [:status :string]
-   [:created_at inst?]
-   [:updated_at inst?]])
+   [:created-at inst?]
+   [:updated-at inst?]])
 
 (def TaskInput
   [:map
@@ -20,13 +22,13 @@
 
 (def TaskUpdate
   [:map
-   [:task_id :string]
+   [:task-id :string]
    [:title {:optional true} :string]
    [:status {:optional true} :string]])
 
 (def TaskId
   [:map
-   [:task_id :string]])
+   [:task-id :string]])
 
 (def TaskStatus
   [:map
@@ -45,19 +47,21 @@
              (h/from :task)
              (h/order-by [:created_at :desc])
              sql/format)
-         (jdbc/execute! db))))
+         (jdbc/execute! db)
+         (mapv #(cske/transform-keys csk/->camelCaseKeyword %)))))
 
 (mx/defn task :- [:maybe Task]
   [context :- Context
    args :- TaskId
    _parent :- Parent]
   (let [db (-> context :db)
-        task-id (:task_id args)]
+        task-id (:task-id args)]
     (->> (-> (h/select :*)
              (h/from :task)
              (h/where [:= :task_id [:cast task-id :uuid]])
              sql/format)
-         (jdbc/execute-one! db))))
+         (jdbc/execute-one! db)
+         (cske/transform-keys csk/->camelCaseKeyword))))
 
 (mx/defn tasks-by-status :- [:vector Task]
   [context :- Context
@@ -70,7 +74,8 @@
              (h/where [:= :status status])
              (h/order-by [:created_at :desc])
              sql/format)
-         (jdbc/execute! db))))
+         (jdbc/execute! db)
+         (mapv #(cske/transform-keys csk/->camelCaseKeyword %)))))
 
 (mx/defn create-task :- Task
   [context :- Context
@@ -82,40 +87,43 @@
              (h/values [{:title title :status status}])
              (h/returning :*)
              sql/format)
-         (jdbc/execute-one! db))))
+         (jdbc/execute-one! db)
+         (cske/transform-keys csk/->camelCaseKeyword))))
 
 (mx/defn update-task :- Task
   [context :- Context
    args :- TaskUpdate
    _parent :- Parent]
   (let [db (-> context :db)
-        {:keys [task_id title status]} args
+        {:keys [task-id title status]} args
         updates (cond-> {}
                   title (assoc :title title)
                   status (assoc :status status))]
     (->> (-> (h/update :task)
              (h/set updates)
-             (h/where [:= :task_id [:cast task_id :uuid]])
+             (h/where [:= :task_id [:cast task-id :uuid]])
              (h/returning :*)
              sql/format)
-         (jdbc/execute-one! db))))
+         (jdbc/execute-one! db)
+         (cske/transform-keys csk/->camelCaseKeyword))))
 
 (mx/defn delete-task :- Task
   [context :- Context
    args :- TaskId
    _parent :- Parent]
   (let [db (-> context :db)
-        task-id (:task_id args)]
+        task-id (:task-id args)]
     (->> (-> (h/delete-from :task)
              (h/where [:= :task_id [:cast task-id :uuid]])
              (h/returning :*)
              sql/format)
-         (jdbc/execute-one! db))))
+         (jdbc/execute-one! db)
+         (cske/transform-keys csk/->camelCaseKeyword))))
 
 (def resolvers
-  {:query/tasks tasks
-   :query/task task
-   :query/tasks-by-status tasks-by-status
-   :mutation/create-task create-task
-   :mutation/update-task update-task
-   :mutation/delete-task delete-task})
+  {:Query/tasks tasks
+   :Query/task task
+   :Query/tasksByStatus tasks-by-status
+   :Mutation/createTask create-task
+   :Mutation/updateTask update-task
+   :Mutation/deleteTask delete-task})

@@ -1,10 +1,9 @@
 (ns conao3.kanban.handler
   (:require
-   [clojure.edn :as edn]
    [clojure.java.io :as io]
    [com.walmartlabs.lacinia :as lacinia]
+   [com.walmartlabs.lacinia.parser.schema :as parser.schema]
    [com.walmartlabs.lacinia.schema :as schema]
-   [com.walmartlabs.lacinia.util :as util]
    [conao3.kanban.resolver.task :as c.resolver.task]
    [ring.util.http-response :as res]))
 
@@ -15,11 +14,24 @@
   [_req]
   (res/ok "ok"))
 
+(defn attach-resolvers-to-fields [schema resolvers]
+  (reduce-kv
+   (fn [acc resolver-key resolver-fn]
+     (let [type-key (namespace resolver-key)
+           field-key (name resolver-key)
+           type-keyword (keyword type-key)
+           field-keyword (keyword field-key)]
+       (update-in acc [:objects type-keyword :fields field-keyword]
+                  (fn [field]
+                    (assoc field :resolve resolver-fn)))))
+   schema
+   resolvers))
+
 (defn compile-schema []
-  (-> (io/resource "graphql-schema.edn")
+  (-> (io/resource "schema.graphql")
       slurp
-      edn/read-string
-      (util/attach-resolvers c.resolver.task/resolvers)
+      parser.schema/parse-schema
+      (attach-resolvers-to-fields c.resolver.task/resolvers)
       schema/compile))
 
 (defmethod handler (with-meta 'api.graphql
