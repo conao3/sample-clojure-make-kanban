@@ -5,4 +5,6 @@
 (defn make-app [router]
   (reitit.ring/ring-handler
    router
-   (reitit.ring/redirect-trailing-slash-handler {:method :strip})))
+   (reitit.ring/routes
+    (reitit.ring/create-resource-handler {:path "/"})
+    (reitit.ring/redirect-trailing-slash-handler {:method :strip}))))
