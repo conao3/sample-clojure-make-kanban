@@ -1,0 +1,8 @@
+{:db {:dbtype "postgresql"
+      :host #or [#env DB_HOST "localhost"]
+      :port #or [#env DB_PORT 15432]
+      :dbname #or [#env DB_NAME "kanban"]
+      :user #or [#env DB_USER "kanban"]
+      :password #or [#env DB_PASSWORD "kanban"]}
+
+ :server {:port #or [#env PORT 8090]}}

@@ -4,11 +4,11 @@
    [com.stuartsierra.component :as component]
    [org.httpkit.server :as httpkit.server]))
 
-(defrecord Server [handler server server-stop-fn]
+(defrecord Server [handler port server server-stop-fn]
   component/Lifecycle
   (start [this]
     (log/info "Starting Server...")
-    (let [ret (httpkit.server/run-server (:handler handler))
+    (let [ret (httpkit.server/run-server (:handler handler) {:port port})
           server (:server (meta ret))]
       (log/info "Started Server at port:" (httpkit.server/server-port server))
       (-> this
