@@ -41,57 +41,57 @@
   [task-id :- :any]
   (str "Task:" task-id))
 
-(mx/defn tasks :- [:vector Task]
+(mx/defn tasks :- [:sequential Task]
   [context :- Context
    _args :- :map
    _parent :- Parent]
   (let [db (-> context :db)]
-    (->> (jdbc/execute! db
-                        (-> (h/select :*)
-                            (h/from :task)
-                            (h/order-by [:created_at :desc])
-                            sql/format))
-         (mapv #(-> % (assoc :id (task-id (:task-id %))))))))
+    (->> (-> (h/select :*)
+             (h/from :task)
+             (h/order-by [:created_at :desc])
+             sql/format)
+         (jdbc/execute! db)
+         (map #(-> % (assoc :id (task-id (:task-id %))))))))
 
 (mx/defn task :- [:maybe Task]
   [context :- Context
    args :- TaskId
    _parent :- Parent]
   (let [db (-> context :db)
-        tid (:task-id args)
-        res (jdbc/execute-one! db
-                               (-> (h/select :*)
-                                   (h/from :task)
-                                   (h/where [:= :task_id [:cast tid :uuid]])
-                                   sql/format))]
-    (some-> res (assoc :id (task-id (:task-id res))))))
+        tid (:task-id args)]
+    (->> (-> (h/select :*)
+             (h/from :task)
+             (h/where [:= :task_id [:cast tid :uuid]])
+             sql/format)
+         (jdbc/execute-one! db)
+         (#(some-> % (assoc :id (task-id (:task-id %))))))))
 
-(mx/defn tasks-by-status :- [:vector Task]
+(mx/defn tasks-by-status :- [:sequential Task]
   [context :- Context
    args :- TaskStatus
    _parent :- Parent]
   (let [db (-> context :db)
         status (:status args)]
-    (->> (jdbc/execute! db
-                        (-> (h/select :*)
-                            (h/from :task)
-                            (h/where [:= :status status])
-                            (h/order-by [:created_at :desc])
-                            sql/format))
-         (mapv #(-> % (assoc :id (task-id (:task-id %))))))))
+    (->> (-> (h/select :*)
+             (h/from :task)
+             (h/where [:= :status status])
+             (h/order-by [:created_at :desc])
+             sql/format)
+         (jdbc/execute! db)
+         (map #(-> % (assoc :id (task-id (:task-id %))))))))
 
 (mx/defn create-task :- Task
   [context :- Context
    args :- TaskInput
    _parent :- Parent]
   (let [db (-> context :db)
-        {:keys [title status]} args
-        res (jdbc/execute-one! db
-                               (-> (h/insert-into :task)
-                                   (h/values [{:title title :status status}])
-                                   (h/returning :*)
-                                   sql/format))]
-    (-> res (assoc :id (task-id (:task-id res))))))
+        {:keys [title status]} args]
+    (->> (-> (h/insert-into :task)
+             (h/values [{:title title :status status}])
+             (h/returning :*)
+             sql/format)
+         (jdbc/execute-one! db)
+         (#(some-> % (assoc :id (task-id (:task-id %))))))))
 
 (mx/defn update-task :- Task
   [context :- Context
@@ -102,27 +102,27 @@
         tid (:task-id args)
         updates (cond-> {}
                   title (assoc :title title)
-                  status (assoc :status status))
-        res (jdbc/execute-one! db
-                               (-> (h/update :task)
-                                   (h/set updates)
-                                   (h/where [:= :task_id [:cast tid :uuid]])
-                                   (h/returning :*)
-                                   sql/format))]
-    (-> res (assoc :id (task-id (:task-id res))))))
+                  status (assoc :status status))]
+    (->> (-> (h/update :task)
+             (h/set updates)
+             (h/where [:= :task_id [:cast tid :uuid]])
+             (h/returning :*)
+             sql/format)
+         (jdbc/execute-one! db)
+         (#(some-> % (assoc :id (task-id (:task-id %))))))))
 
 (mx/defn delete-task :- Task
   [context :- Context
    args :- TaskId
    _parent :- Parent]
   (let [db (-> context :db)
-        tid (:task-id args)
-        res (jdbc/execute-one! db
-                               (-> (h/delete-from :task)
-                                   (h/where [:= :task_id [:cast tid :uuid]])
-                                   (h/returning :*)
-                                   sql/format))]
-    (-> res (assoc :id (task-id (:task-id res))))))
+        tid (:task-id args)]
+    (->> (-> (h/delete-from :task)
+             (h/where [:= :task_id [:cast tid :uuid]])
+             (h/returning :*)
+             sql/format)
+         (jdbc/execute-one! db)
+         (#(some-> % (assoc :id (task-id (:task-id %))))))))
 
 (def resolvers
   {:Query/tasks tasks
