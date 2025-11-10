@@ -10,7 +10,7 @@
 
 (defn -main [& args]
   (println "Hello World," args)
-  (let [system (-> (c.system/new-system)
+  (let [system (-> (c.system/new-system :default)
                    component/start-system)]
     (-> (Runtime/getRuntime)
         (.addShutdownHook (Thread. (fn []
