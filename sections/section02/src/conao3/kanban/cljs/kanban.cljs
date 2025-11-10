@@ -1,5 +1,6 @@
 (ns ^:figwheel-hooks conao3.kanban.cljs.kanban
   (:require
+   ["react" :as react]
    ["urql" :as urql]
    [reagent.dom.client :as reagent.dom.client]))
 
@@ -9,6 +10,14 @@
                       #js {:url "/api/graphql"
                            :exchanges #js [urql.cacheExchange urql.fetchExchange]
                            :preferGetMethod false}))
+
+(defn TaskAdder []
+  (let [[task-name set-task-name] (react/useState "")]
+    [:div
+     [:h2 "Add Task"]
+     [:input {:value task-name :on-change set-task-name}]
+     [:button {:type "button"}
+      "Add"]]))
 
 (defn TaskList []
   (let [[result] (urql.useQuery #js {:query "query { tasks { id taskId title status createdAt updatedAt } }"})
@@ -30,6 +39,7 @@
   [:> urql.Provider {:value urql-client}
    [:div
     [:h1 "Kanban Board"]
+    [:f> TaskAdder]
     [:f> TaskList]]])
 
 (defonce root (-> js/document (.getElementById "app") reagent.dom.client/create-root))
