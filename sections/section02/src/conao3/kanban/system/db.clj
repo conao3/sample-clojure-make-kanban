@@ -2,13 +2,15 @@
   (:require
    [clojure.tools.logging :as log]
    [com.stuartsierra.component :as component]
-   [next.jdbc :as jdbc]))
+   [next.jdbc :as jdbc]
+   [next.jdbc.result-set :as jdbc.result-set]))
 
 (defrecord Db [db db-spec]
   component/Lifecycle
   (start [this]
     (log/info "Starting Db...")
-    (let [ds (jdbc/get-datasource db-spec)]
+    (let [ds (-> (jdbc/get-datasource db-spec)
+                 (jdbc/with-options {:builder-fn jdbc.result-set/as-unqualified-kebab-maps}))]
       (log/info "Started Db")
       (assoc this :db ds)))
 

@@ -3,8 +3,7 @@
    [honey.sql :as sql]
    [honey.sql.helpers :as h]
    [malli.experimental :as mx]
-   [next.jdbc :as jdbc]
-   [next.jdbc.result-set :as rs]))
+   [next.jdbc :as jdbc]))
 
 (def Task
   [:map
@@ -51,8 +50,7 @@
                         (-> (h/select :*)
                             (h/from :task)
                             (h/order-by [:created_at :desc])
-                            sql/format)
-                        {:builder-fn rs/as-unqualified-kebab-maps})
+                            sql/format))
          (mapv #(-> % (assoc :id (task-id (:task-id %))))))))
 
 (mx/defn task :- [:maybe Task]
@@ -65,8 +63,7 @@
                                (-> (h/select :*)
                                    (h/from :task)
                                    (h/where [:= :task_id [:cast tid :uuid]])
-                                   sql/format)
-                               {:builder-fn rs/as-unqualified-kebab-maps})]
+                                   sql/format))]
     (some-> res (assoc :id (task-id (:task-id res))))))
 
 (mx/defn tasks-by-status :- [:vector Task]
@@ -80,8 +77,7 @@
                             (h/from :task)
                             (h/where [:= :status status])
                             (h/order-by [:created_at :desc])
-                            sql/format)
-                        {:builder-fn rs/as-unqualified-kebab-maps})
+                            sql/format))
          (mapv #(-> % (assoc :id (task-id (:task-id %))))))))
 
 (mx/defn create-task :- Task
@@ -94,8 +90,7 @@
                                (-> (h/insert-into :task)
                                    (h/values [{:title title :status status}])
                                    (h/returning :*)
-                                   sql/format)
-                               {:builder-fn rs/as-unqualified-kebab-maps})]
+                                   sql/format))]
     (-> res (assoc :id (task-id (:task-id res))))))
 
 (mx/defn update-task :- Task
@@ -113,8 +108,7 @@
                                    (h/set updates)
                                    (h/where [:= :task_id [:cast tid :uuid]])
                                    (h/returning :*)
-                                   sql/format)
-                               {:builder-fn rs/as-unqualified-kebab-maps})]
+                                   sql/format))]
     (-> res (assoc :id (task-id (:task-id res))))))
 
 (mx/defn delete-task :- Task
@@ -127,8 +121,7 @@
                                (-> (h/delete-from :task)
                                    (h/where [:= :task_id [:cast tid :uuid]])
                                    (h/returning :*)
-                                   sql/format)
-                               {:builder-fn rs/as-unqualified-kebab-maps})]
+                                   sql/format))]
     (-> res (assoc :id (task-id (:task-id res))))))
 
 (def resolvers
