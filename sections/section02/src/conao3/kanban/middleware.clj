@@ -12,7 +12,7 @@
         (map? (:body res))
         (update :body (partial cske/transform-keys
                                (fn [x]
-                                 (str (re-find #"_*" (name x)) (csk/->camelCase (name x))))))))))
+                                 (-> (str (re-find #"_*" (name x)) (csk/->camelCase (name x))) keyword))))))))
 
 (defn wrap-schema [handler schema]
   (fn [request]
