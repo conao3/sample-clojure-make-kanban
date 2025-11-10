@@ -38,7 +38,7 @@
 (def Parent :any)
 
 (mx/defn task-id :- :string
-  [task-id :- :any]
+  [task-id :- [:or :uuid :string]]
   (str "Task:" task-id))
 
 (mx/defn tasks :- [:sequential Task]
