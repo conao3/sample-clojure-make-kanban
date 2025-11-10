@@ -1,5 +1,7 @@
 (ns conao3.kanban.resolver.task
   (:require
+   [camel-snake-kebab.core :as csk]
+   [camel-snake-kebab.extras :as cske]
    [honey.sql :as sql]
    [honey.sql.helpers :as h]
    [malli.experimental :as mx]
@@ -51,7 +53,8 @@
              (h/order-by [:created_at :desc])
              sql/format)
          (jdbc/execute! db)
-         (map #(-> % (assoc :id (task-id (:task-id %))))))))
+         (map #(-> % (assoc :id (task-id (:task-id %)))))
+         (cske/transform-keys csk/->camelCase))))
 
 (mx/defn task :- [:maybe Task]
   [context :- Context
@@ -64,7 +67,8 @@
              (h/where [:= :task_id [:cast tid :uuid]])
              sql/format)
          (jdbc/execute-one! db)
-         (#(some-> % (assoc :id (task-id (:task-id %))))))))
+         (#(some-> % (assoc :id (task-id (:task-id %)))))
+         (cske/transform-keys csk/->camelCase))))
 
 (mx/defn tasks-by-status :- [:sequential Task]
   [context :- Context
@@ -78,7 +82,8 @@
              (h/order-by [:created_at :desc])
              sql/format)
          (jdbc/execute! db)
-         (map #(-> % (assoc :id (task-id (:task-id %))))))))
+         (map #(-> % (assoc :id (task-id (:task-id %)))))
+         (cske/transform-keys csk/->camelCase))))
 
 (mx/defn create-task :- Task
   [context :- Context
@@ -91,7 +96,8 @@
              (h/returning :*)
              sql/format)
          (jdbc/execute-one! db)
-         (#(some-> % (assoc :id (task-id (:task-id %))))))))
+         (#(some-> % (assoc :id (task-id (:task-id %)))))
+         (cske/transform-keys csk/->camelCase))))
 
 (mx/defn update-task :- Task
   [context :- Context
@@ -109,7 +115,8 @@
              (h/returning :*)
              sql/format)
          (jdbc/execute-one! db)
-         (#(some-> % (assoc :id (task-id (:task-id %))))))))
+         (#(some-> % (assoc :id (task-id (:task-id %)))))
+         (cske/transform-keys csk/->camelCase))))
 
 (mx/defn delete-task :- Task
   [context :- Context
@@ -122,7 +129,8 @@
              (h/returning :*)
              sql/format)
          (jdbc/execute-one! db)
-         (#(some-> % (assoc :id (task-id (:task-id %))))))))
+         (#(some-> % (assoc :id (task-id (:task-id %)))))
+         (cske/transform-keys csk/->camelCase))))
 
 (def resolvers
   {:Query/tasks tasks

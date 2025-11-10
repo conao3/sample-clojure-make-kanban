@@ -1,7 +1,8 @@
 (ns conao3.kanban.middleware
   (:require
    [camel-snake-kebab.core :as csk]
-   [camel-snake-kebab.extras :as cske]))
+   [camel-snake-kebab.extras :as cske]
+   [conao3.kanban.util :as c.util]))
 
 (defn transform-keys [handler]
   (fn [req]
@@ -10,9 +11,7 @@
                          (update :params (partial cske/transform-keys csk/->kebab-case))))]
       (cond-> res
         (map? (:body res))
-        (update :body (partial cske/transform-keys
-                               (fn [x]
-                                 (-> (str (re-find #"_*" (name x)) (csk/->camelCase (name x))) keyword))))))))
+        (update :body (partial cske/transform-keys c.util/camelCasePreserveUnderbarPrefix))))))
 
 (defn wrap-schema [handler schema]
   (fn [request]

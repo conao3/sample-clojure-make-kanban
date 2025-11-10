@@ -46,8 +46,7 @@
         variables (or (:variables body) {})
         operation-name (:operationName body)
         context {:db (:db db)}
-        result (-> (lacinia/execute schema query variables context {:operation-name operation-name})
-                   (c.util/walk-update-keys csk/->camelCase))]
+        result (lacinia/execute schema query variables context {:operation-name operation-name})]
     (if (:errors result)
       (res/bad-request result)
       (res/ok result))))
