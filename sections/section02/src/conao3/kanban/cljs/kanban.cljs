@@ -36,20 +36,68 @@ mutation createTask ($title: String!) {
         "Error: " (str error)])]))
 
 (defn TaskList []
-  (let [result (apollo.react/useQuery (apollo/gql "query tasks { tasks { id taskId title status createdAt updatedAt } }"))
+  (let [result (apollo.react/useQuery (apollo/gql "
+query tasks {
+  tasks {
+    id taskId title status createdAt updatedAt
+  }
+}"))
+        [update-task] (apollo.react/useMutation
+                       (apollo/gql "
+mutation updateTask($taskId: String! $status: String!) {
+  updateTask(taskId: $taskId status: $status) {
+    id status
+  }
+}"))
+        [delete-task] (apollo.react/useMutation
+                       (apollo/gql "
+mutation deleteTask($taskId: String!) {
+  deleteTask(taskId: $taskId) {
+    id
+  }
+}")
+                       #js {:refetchQueries #js ["tasks"]})
         tasks (some-> result .-data .-tasks (js->clj :keywordize-keys true))]
     [:div
      [:h2 "Tasks"]
-     (cond
-       (.-loading result) [:p "fetching..."]
-       (.-error result) [:p "error" (-> result .-error .-message)]
-       :else
+     [:div {:style {:display "flex"
+                    :max-width "1000px"}}
+      [:div {:style {:flex 1}}
+       [:h3 "Todo"]
        [:ul
-        (if (empty? tasks)
-          [:p "No tasks found"]
-          (->> tasks
-               (map (fn [task]
-                      [:li {:key (:id task)} (:title task) " - " (:status task)]))))])]))
+        (->> tasks (filter #(= "TODO" (:status %)))
+             (map (fn [task]
+                    [:li {:key (:id task)}
+                     (:title task)
+                     [:button {:type "button"
+                               :on-click #(update-task
+                                           #js {:variables
+                                                #js {:taskId (:taskId task) :status "DOING"}})}
+                      "Next"]])))]
+       (when (.-loading result) [:div "fetching..."])
+       (when (.-error result) [:div "error" (-> result .-error .-message)])]
+      [:div {:style {:flex 1}}
+       [:h3 "Doing"]
+       [:ul
+        (->> tasks (filter #(= "DOING" (:status %)))
+             (map (fn [task]
+                    [:li {:key (:id task)}
+                     (:title task)
+                     [:button {:type "button"
+                               :on-click #(update-task
+                                           #js {:variables
+                                                #js {:taskId (:taskId task) :status "DONE"}})}
+                      "Next"]])))]]
+      [:div {:style {:flex 1}}
+       [:h3 "Done"]
+       [:ul
+        (->> tasks (filter #(= "DONE" (:status %)))
+             (map (fn [task]
+                    [:li {:key (:id task)}
+                     (:title task)
+                     [:button {:type "button"
+                               :on-click #(delete-task #js {:variables #js {:taskId (:taskId task)}})}
+                      "Delete"]])))]]]]))
 
 (defn App []
   [:> apollo.react/ApolloProvider {:client apollo-client}
