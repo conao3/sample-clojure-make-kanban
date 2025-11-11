@@ -1,56 +1,58 @@
 (ns ^:figwheel-hooks conao3.kanban.cljs.kanban
   (:require
+   ["@apollo/client" :as apollo :refer [ApolloClient]]
+   ["@apollo/client/react" :as apollo.react]
    ["react" :as react]
-   ["urql" :as urql]
    [reagent.dom.client :as reagent.dom.client]))
 
 (enable-console-print!)
 
-(defonce urql-client (urql/Client.
-                      #js {:url "/api/graphql"
-                           :exchanges #js [urql/cacheExchange urql/fetchExchange]
-                           :preferGetMethod false}))
+(defonce apollo-client (ApolloClient.
+                        #js {:link (apollo/HttpLink. #js {:uri "/api/graphql"})
+                             :cache (apollo/InMemoryCache.)
+                             :connectToDevTools goog.DEBUG}))
 
 (defn TaskAdder []
   (let [[title set-title] (react/useState "")
-        [result create-task] (urql/useMutation "
-mutation ($title: String!) {
+        [create-task result] (apollo.react/useMutation
+                              (apollo/gql "
+mutation createTask ($title: String!) {
   createTask(title: $title status: \"TODO\") {
     id taskId title status createdAt updatedAt
   }
 }")
-        fetching (-> result .-fetching)]
+                              #js {:refetchQueries #js ["tasks"]})]
     [:div
      [:h2 "Add Task"]
      [:input {:value title :on-change #(set-title (-> % .-target .-value))}]
      [:button {:type "button"
                :on-click (fn []
-                           (create-task #js {:title title})
+                           (create-task #js {:variables #js {:title title}})
                            (set-title ""))
-               :disabled fetching}
+               :disabled (-> result .-loading)}
       "Add"]
      (when-let [error (-> result .-error)]
        [:div {:style {:color "red"}}
         "Error: " (str error)])]))
 
 (defn TaskList []
-  (let [[result] (urql/useQuery #js {:query "query { tasks { id taskId title status createdAt updatedAt } }"})
+  (let [result (apollo.react/useQuery (apollo/gql "query tasks { tasks { id taskId title status createdAt updatedAt } }"))
         tasks (some-> result .-data .-tasks (js->clj :keywordize-keys true))]
     [:div
      [:h2 "Tasks"]
      (cond
-       (.-fetching result) [:p "fetching..."]
-       (.-error result) [:p "error" (.-error result)]
+       (.-loading result) [:p "fetching..."]
+       (.-error result) [:p "error" (-> result .-error .-message)]
        :else
        [:ul
         (if (empty? tasks)
           [:p "No tasks found"]
           (->> tasks
-             (map (fn [task]
-                    [:li {:key (:id task)} (:title task) " - " (:status task)]))))])]))
+               (map (fn [task]
+                      [:li {:key (:id task)} (:title task) " - " (:status task)]))))])]))
 
 (defn App []
-  [:> urql/Provider {:value urql-client}
+  [:> apollo.react/ApolloProvider {:client apollo-client}
    [:div
     [:h1 "Kanban Board"]
     [:f> TaskAdder]
