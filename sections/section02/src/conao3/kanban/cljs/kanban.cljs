@@ -6,9 +6,9 @@
 
 (enable-console-print!)
 
-(defonce urql-client (urql.Client.
+(defonce urql-client (urql/Client.
                       #js {:url "/api/graphql"
-                           :exchanges #js [urql.cacheExchange urql.fetchExchange]
+                           :exchanges #js [urql/cacheExchange urql/fetchExchange]
                            :preferGetMethod false}))
 
 (defn TaskAdder []
@@ -34,7 +34,7 @@ mutation ($title: String!) {
         "Error: " (str error)])]))
 
 (defn TaskList []
-  (let [[result] (urql.useQuery #js {:query "query { tasks { id taskId title status createdAt updatedAt } }"})
+  (let [[result] (urql/useQuery #js {:query "query { tasks { id taskId title status createdAt updatedAt } }"})
         tasks (some-> result .-data .-tasks (js->clj :keywordize-keys true))]
     [:div
      [:h2 "Tasks"]
@@ -50,7 +50,7 @@ mutation ($title: String!) {
                     [:li {:key (:id task)} (:title task) " - " (:status task)]))))])]))
 
 (defn App []
-  [:> urql.Provider {:value urql-client}
+  [:> urql/Provider {:value urql-client}
    [:div
     [:h1 "Kanban Board"]
     [:f> TaskAdder]
