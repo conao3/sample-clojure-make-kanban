@@ -31,10 +31,6 @@
   [:map
    [:task-id :string]])
 
-(def TaskStatus
-  [:map
-   [:status :string]])
-
 (def Context :map)
 
 (def Parent :any)
@@ -50,35 +46,6 @@
   (let [db (-> context :db)]
     (->> (-> (h/select :*)
              (h/from :task)
-             (h/order-by [:created_at :desc])
-             sql/format)
-         (jdbc/execute! db)
-         (map #(-> % (assoc :id (task-id (:task-id %)))))
-         (cske/transform-keys csk/->camelCase))))
-
-(mx/defn task :- [:maybe Task]
-  [context :- Context
-   args :- TaskId
-   _parent :- Parent]
-  (let [db (-> context :db)
-        tid (:task-id args)]
-    (->> (-> (h/select :*)
-             (h/from :task)
-             (h/where [:= :task_id [:cast tid :uuid]])
-             sql/format)
-         (jdbc/execute-one! db)
-         (#(some-> % (assoc :id (task-id (:task-id %)))))
-         (cske/transform-keys csk/->camelCase))))
-
-(mx/defn tasks-by-status :- [:sequential Task]
-  [context :- Context
-   args :- TaskStatus
-   _parent :- Parent]
-  (let [db (-> context :db)
-        status (:status args)]
-    (->> (-> (h/select :*)
-             (h/from :task)
-             (h/where [:= :status status])
              (h/order-by [:created_at :desc])
              sql/format)
          (jdbc/execute! db)
@@ -134,8 +101,6 @@
 
 (def resolvers
   {:Query/tasks tasks
-   :Query/task task
-   :Query/tasksByStatus tasks-by-status
    :Mutation/createTask create-task
    :Mutation/updateTask update-task
    :Mutation/deleteTask delete-task})

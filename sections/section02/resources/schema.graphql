@@ -9,8 +9,6 @@ type Task {
 
 type Query {
   tasks: [Task]
-  task(taskId: String!): Task
-  tasksByStatus(status: String!): [Task]
 }
 
 type Mutation {

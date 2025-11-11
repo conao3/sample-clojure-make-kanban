@@ -9,7 +9,7 @@ endif
 
 .PHONY: repl
 repl:
-	clj -M:dev:repl
+	clj -M:dev:nrepl:repl
 
 .PHONY: update
 update:

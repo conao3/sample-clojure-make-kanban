@@ -4,14 +4,15 @@
   com.github.clj-easy/graal-build-time {:mvn/version "1.0.5"}}
 
  :aliases
- {:dev {:extra-paths ["dev"]
+ {:dev {:extra-paths ["dev" "resources-dev"]
         :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}}}
-  :repl {:extra-deps {nrepl/nrepl {:mvn/version "1.4.0"}
-                      cider/cider-nrepl {:mvn/version "0.57.0"}}
-         :jvm-opts ["-Djdk.attach.allowAttachSelf"]
-         :main-opts ["-m" "nrepl.cmdline"
+  :nrepl {:extra-deps {nrepl/nrepl {:mvn/version "1.5.1"}
+                       cider/cider-nrepl {:mvn/version "0.58.0"}
+                       cider/piggieback {:mvn/version "0.6.1"}}
+          :jvm-opts ["-Djdk.attach.allowAttachSelf"]}
+  :repl {:main-opts ["-m" "nrepl.cmdline"
                      "--interactive"
-                     "--middleware" "[cider.nrepl/cider-middleware]"]}
+                     "--middleware" "[cider.nrepl/cider-middleware,cider.piggieback/wrap-cljs-repl]"]}
   :test {:main-opts ["-e" "(require 'dev)" "-m" "kaocha.runner"]}
   :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.10"}}
           :ns-default build}}}
