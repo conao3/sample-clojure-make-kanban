@@ -12,12 +12,26 @@
                            :preferGetMethod false}))
 
 (defn TaskAdder []
-  (let [[task-name set-task-name] (react/useState "")]
+  (let [[title set-title] (react/useState "")
+        [result create-task] (urql/useMutation "
+mutation ($title: String!) {
+  createTask(title: $title status: \"TODO\") {
+    id taskId title status createdAt updatedAt
+  }
+}")
+        fetching (-> result .-fetching)]
     [:div
      [:h2 "Add Task"]
-     [:input {:value task-name :on-change set-task-name}]
-     [:button {:type "button"}
-      "Add"]]))
+     [:input {:value title :on-change #(set-title (-> % .-target .-value))}]
+     [:button {:type "button"
+               :on-click (fn []
+                           (create-task #js {:title title})
+                           (set-title ""))
+               :disabled fetching}
+      "Add"]
+     (when-let [error (-> result .-error)]
+       [:div {:style {:color "red"}}
+        "Error: " (str error)])]))
 
 (defn TaskList []
   (let [[result] (urql.useQuery #js {:query "query { tasks { id taskId title status createdAt updatedAt } }"})
