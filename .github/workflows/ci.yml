@@ -1,0 +1,146 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: cljstyle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: DeLaGuardo/setup-clojure@13.0
+        with:
+          cli: latest
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+          key: deps-lint-${{ hashFiles('**/deps.edn') }}
+          restore-keys: deps-lint-
+
+      - name: Check formatting
+        run: >-
+          clojure -Sdeps '{:deps {mvxcvi/cljstyle {:mvn/version "0.17.642"}}}'
+          -M -m cljstyle.main check
+
+  test-clojure:
+    name: test (${{ matrix.section }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        section: [section01, section99]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: DeLaGuardo/setup-clojure@13.0
+        with:
+          cli: latest
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+          key: deps-${{ matrix.section }}-${{ hashFiles(format('sections/{0}/deps.edn', matrix.section)) }}
+          restore-keys: deps-${{ matrix.section }}-
+
+      - name: Run tests
+        run: make -C sections/${{ matrix.section }} test
+
+  test-clojure-section02:
+    name: test (section02)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: kanban
+          POSTGRES_PASSWORD: kanban
+          POSTGRES_DB: kanban
+        ports:
+          - 15432:5432
+        options: >-
+          --health-cmd "pg_isready -U kanban"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: DeLaGuardo/setup-clojure@13.0
+        with:
+          cli: latest
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+          key: deps-section02-${{ hashFiles('sections/section02/deps.edn') }}
+          restore-keys: deps-section02-
+
+      - name: Provision databases
+        env:
+          PGPASSWORD: kanban
+        run: |
+          psql -h localhost -p 15432 -U kanban -d kanban \
+            -c 'CREATE DATABASE kanban_test;'
+          psql -h localhost -p 15432 -U kanban -d kanban \
+            -f sections/section02/schema.sql
+          psql -h localhost -p 15432 -U kanban -d kanban_test \
+            -f sections/section02/schema.sql
+
+      - name: Run tests
+        run: make -C sections/section02 test
+
+  frontend:
+    name: frontend (${{ matrix.section }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        section: [section02, section99]
+    defaults:
+      run:
+        working-directory: sections/${{ matrix.section }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+          cache-dependency-path: sections/${{ matrix.section }}/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile

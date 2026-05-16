@@ -1,7 +1,5 @@
 (ns conao3.kanban.resolver.task
   (:require
-   [camel-snake-kebab.core :as csk]
-   [camel-snake-kebab.extras :as cske]
    [honey.sql :as sql]
    [honey.sql.helpers :as h]
    [malli.experimental :as mx]
@@ -31,6 +29,10 @@
   [:map
    [:task-id :string]])
 
+(def TaskStatus
+  [:map
+   [:status :string]])
+
 (def Context :map)
 
 (def Parent :any)
@@ -49,8 +51,34 @@
              (h/order-by [:created_at :desc])
              sql/format)
          (jdbc/execute! db)
-         (map #(-> % (assoc :id (task-id (:task-id %)))))
-         (cske/transform-keys csk/->camelCase))))
+         (map #(-> % (assoc :id (task-id (:task-id %))))))))
+
+(mx/defn task :- [:maybe Task]
+  [context :- Context
+   args :- TaskId
+   _parent :- Parent]
+  (let [db (-> context :db)
+        tid (:task-id args)]
+    (->> (-> (h/select :*)
+             (h/from :task)
+             (h/where [:= :task_id [:cast tid :uuid]])
+             sql/format)
+         (jdbc/execute-one! db)
+         (#(some-> % (assoc :id (task-id (:task-id %))))))))
+
+(mx/defn tasks-by-status :- [:sequential Task]
+  [context :- Context
+   args :- TaskStatus
+   _parent :- Parent]
+  (let [db (-> context :db)
+        status (:status args)]
+    (->> (-> (h/select :*)
+             (h/from :task)
+             (h/where [:= :status status])
+             (h/order-by [:created_at :desc])
+             sql/format)
+         (jdbc/execute! db)
+         (map #(-> % (assoc :id (task-id (:task-id %))))))))
 
 (mx/defn create-task :- Task
   [context :- Context
@@ -63,8 +91,7 @@
              (h/returning :*)
              sql/format)
          (jdbc/execute-one! db)
-         (#(some-> % (assoc :id (task-id (:task-id %)))))
-         (cske/transform-keys csk/->camelCase))))
+         (#(some-> % (assoc :id (task-id (:task-id %))))))))
 
 (mx/defn update-task :- Task
   [context :- Context
@@ -82,8 +109,7 @@
              (h/returning :*)
              sql/format)
          (jdbc/execute-one! db)
-         (#(some-> % (assoc :id (task-id (:task-id %)))))
-         (cske/transform-keys csk/->camelCase))))
+         (#(some-> % (assoc :id (task-id (:task-id %))))))))
 
 (mx/defn delete-task :- Task
   [context :- Context
@@ -96,11 +122,12 @@
              (h/returning :*)
              sql/format)
          (jdbc/execute-one! db)
-         (#(some-> % (assoc :id (task-id (:task-id %)))))
-         (cske/transform-keys csk/->camelCase))))
+         (#(some-> % (assoc :id (task-id (:task-id %))))))))
 
 (def resolvers
   {:Query/tasks tasks
+   :Query/task task
+   :Query/tasksByStatus tasks-by-status
    :Mutation/createTask create-task
    :Mutation/updateTask update-task
    :Mutation/deleteTask delete-task})
