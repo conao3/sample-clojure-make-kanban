@@ -31,7 +31,7 @@ This repository contains a step-by-step tutorial for building a kanban board fro
 ## Requirements
 
 - [Nix](https://nixos.org/) with flakes enabled (recommended)
-- Or manually: JDK 21+, Clojure CLI, Node.js 22+, pnpm
+- Or manually: JDK 25+, Clojure CLI, Node.js 26+, pnpm
 
 ## Getting Started
 
