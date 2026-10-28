@@ -5,9 +5,9 @@
   "keywords": [],
   "author": "",
   "license": "Apache-2.0",
-  "packageManager": "pnpm@10.15.0",
+  "packageManager": "pnpm@12.9.0",
   "engines": {
-    "node": "^22.18.0"
+    "node": "^26.12.1"
   },
   "dependencies": {
     "@apollo/client": "^4.3.5",

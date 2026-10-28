@@ -1,18 +1,18 @@
 {:paths ["src" "resources"]
  :deps
- {org.clojure/clojure {:mvn/version "1.12.2"}
-  com.github.clj-easy/graal-build-time {:mvn/version "1.0.5"}}
+ {org.clojure/clojure {:mvn/version "1.12.6"}
+  com.github.clj-easy/graal-build-time {:mvn/version "1.0.6"}}
 
  :aliases
  {:dev {:extra-paths ["dev" "resources-dev"]
         :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}}}
-  :nrepl {:extra-deps {nrepl/nrepl {:mvn/version "1.5.1"}
-                       cider/cider-nrepl {:mvn/version "0.58.0"}
-                       cider/piggieback {:mvn/version "0.6.1"}}
+  :nrepl {:extra-deps {nrepl/nrepl {:mvn/version "1.8.0"}
+                       cider/cider-nrepl {:mvn/version "0.63.1"}
+                       cider/piggieback {:mvn/version "0.8.0"}}
           :jvm-opts ["-Djdk.attach.allowAttachSelf"]}
   :repl {:main-opts ["-m" "nrepl.cmdline"
                      "--interactive"
                      "--middleware" "[cider.nrepl/cider-middleware,cider.piggieback/wrap-cljs-repl]"]}
   :test {:main-opts ["-e" "(require 'dev)" "-m" "kaocha.runner"]}
-  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.10"}}
+  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.14"}}
           :ns-default build}}}

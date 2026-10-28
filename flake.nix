@@ -26,12 +26,12 @@
 
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
-              graalvm-ce
-              (clojure.override { jdk = graalvm-ce; })
+              graalvmPackages.graalvm-ce
+              (clojure.override { jdk = graalvmPackages.graalvm-ce; })
               clojure-lsp
               cljstyle
-              nodejs_22
-              pnpm_10
+              nodejs_latest
+              pnpm
               sqldef
             ];
           };
