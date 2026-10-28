@@ -5,9 +5,9 @@
   "keywords": [],
   "author": "",
   "license": "Apache-2.0",
-  "packageManager": "pnpm@10.15.0",
+  "packageManager": "pnpm@12.9.0",
   "engines": {
-    "node": "^22.18.0"
+    "node": "^26.12.1"
   },
   "dependencies": {
     "process": "^0.11.10",
@@ -16,6 +16,6 @@
     "scheduler": "^0.28.0"
   },
   "devDependencies": {
-    "shadow-cljs": "^3.5.7"
+    "shadow-cljs": "^3.5.8"
   }
 }
