@@ -37,7 +37,7 @@
         :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}
                      com.stuartsierra/component.repl {:mvn/version "1.0.0"}}}
   :nrepl {:extra-deps {nrepl/nrepl {:mvn/version "1.8.0"}
-                       cider/cider-nrepl {:mvn/version "0.63.1"}
+                       cider/cider-nrepl {:mvn/version "0.64.1"}
                        cider/piggieback {:mvn/version "0.8.0"}}
          :jvm-opts ["-Djdk.attach.allowAttachSelf"]}
   :repl {:main-opts ["-m" "nrepl.cmdline"
