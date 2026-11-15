@@ -10,7 +10,7 @@
     "node": "^26.12.1"
   },
   "dependencies": {
-    "@apollo/client": "^4.3.7",
+    "@apollo/client": "^4.3.8",
     "graphql": "^17.1.0",
     "process": "^0.11.10",
     "react": "^19.3.1",
